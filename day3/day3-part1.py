@@ -21,10 +21,6 @@ def getSmallestDistance(manhattanDistances):
     manhattanDistances.remove(0)
     return min(manhattanDistances)
 
-def getNextCoordinate(startCoordinate, distance):
-    """ Uses the given distance to calculate the next coordinate along from the given startCoordinate """
-    return [x + y for x,y in zip(startCoordinate, distance)]
-
 def getDistance(instruction):
     """ Extracts the distance value from the given instruction """
     return int(instruction.lstrip('UDLR'))
