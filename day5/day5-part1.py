@@ -1,92 +1,103 @@
 import sys, os, itertools
 
-opcodeBlockSizes = { 1: 4, 2: 4, 3: 2, 4: 2, 99: 1 }
+opcodeBlockSizes = { 1: 4, 2: 4, 3: 2, 4: 2, 5: 3, 6: 3, 7: 4, 8: 4, 99: 1 }
 
 def getOpcode(intcodeBlock):
     return int(str(intcodeBlock)[-2:].lstrip('0'))
 
-def getParameterModes(intcodeBlock):
+def getModes(intcodeBlock):
     return list(str(intcodeBlock)[:-2][::-1])
 
-def getParameterValues(intcode, startPosition):
+def getParameters(intcode, position):
+
     parameters = {}
-    opcode = getOpcode(intcode[startPosition])
-    parameterModes = getParameterModes(intcode[startPosition])
+
+    opcode = getOpcode(intcode[position])
+    modes = getModes(intcode[position])
 
     for index in range(opcodeBlockSizes[opcode] - 1):
         
-        if opcode == 3 or opcode == 4:
-            parameterMode = 1
-        elif parameterModes[index:]:
-            parameterMode = parameterModes[index]
-        else:
-            parameterMode = 0
+        mode = modes[index] if modes[index:] else 0
 
-        if int(parameterMode) == 0:
-            # Position mode
-            parameters[index] = int(intcode[intcode[startPosition + index + 1]])
+        if int(mode) == 1 or opcode in [3,4]:
+            # Value/Immediate mode - the value given is to be used
+            parameters[index] = position + index + 1
 
-        elif int(parameterMode) == 1:
-            # Value/Immediate mode
-            parameters[index] = int(intcode[startPosition + index + 1])
+        elif int(mode) == 0:
+            # Position mode - the value given indicates where the value is stored
+            parameters[index] = intcode[position + index + 1]
 
     return parameters
 
-def intcodeAddition(intcode, startPosition):
-    parameters = getParameterValues(intcode, startPosition)
-    resultPosition = intcode[startPosition + 3]
+def intcodeAddition(intcode, parameters):
 
-    intcode[resultPosition] = parameters[0] + parameters[1]
+    intcode[parameters[2]] = int(intcode[parameters[0]]) + int(intcode[parameters[1]])
     
     return intcode
 
-def intcodeMultiplication(intcode, startPosition):
-    parameters = getParameterValues(intcode, startPosition)
-    resultPosition = intcode[startPosition + 3]
+def intcodeMultiplication(intcode, parameters):
 
-    intcode[resultPosition] = parameters[0] * parameters[1]
+    intcode[parameters[2]] = int(intcode[parameters[0]]) * int(intcode[parameters[1]])
     
     return intcode
 
-def intcodeInsertValue(intcode, startPosition):
-    parameters = getParameterValues(intcode, startPosition)
-    # Get input from user
-    inputValue = input("Please input a value: ")
-    # Insert the value given into the location from the parameter
-    intcode[parameters[0]] = inputValue
+def intcodeInsertValue(intcode, position):
+
+    intcode[intcode[position]] = int(input("Please input a value: "))
+    
     return intcode
 
-def intcodeOutputValue(intcode, startPosition):
-    parameters = getParameterValues(intcode, startPosition)
-    # Output the value at the location given by the parameter
-    print(intcode[parameters[0]])
-
+def intcodeOutputValue(intcode, position):
+    
+    print(intcode[intcode[position]])
 
 def processIntcode(intcode):
 
-    blockPosition = 0
+    position = 0
 
-    while blockPosition < len(intcode):
+    while position < len(intcode):
 
-        block = intcode[blockPosition]
-        opcode = getOpcode(block)
+        opcode = getOpcode(intcode[position])
+        parameters = getParameters(intcode, position)
         
         if opcode == 99:
             break
 
         elif opcode == 1:
-            intcode = intcodeAddition(intcode, blockPosition)
+            intcode = intcodeAddition(intcode, parameters)
         
         elif opcode == 2:
-            intcode = intcodeMultiplication(intcode, blockPosition)
+            intcode = intcodeMultiplication(intcode, parameters)
         
         elif opcode == 3:
-            intcode = intcodeInsertValue(intcode, blockPosition)
+            intcode = intcodeInsertValue(intcode, parameters[0])
         
         elif opcode == 4:
-            intcodeOutputValue(intcode, blockPosition)
+            intcodeOutputValue(intcode, parameters[0])
 
-        blockPosition += opcodeBlockSizes[opcode]
+        elif opcode == 5:
+            if intcode[parameters[0]] != 0:
+                position = intcode[parameters[1]]
+                continue
+        
+        elif opcode == 6:
+            if intcode[parameters[0]] == 0:
+                position = intcode[parameters[1]]
+                continue
+        
+        elif opcode == 7:
+            if int(intcode[parameters[0]]) < int(intcode[parameters[1]]):
+                intcode[intcode[parameters[2]]] = 1
+            else:
+                intcode[intcode[parameters[2]]] = 0
+
+        elif opcode == 8:
+            if int(intcode[parameters[0]]) == int(intcode[parameters[1]]):
+                intcode[intcode[parameters[2]]] = 1
+            else:
+                intcode[intcode[parameters[2]]] = 0
+
+        position += opcodeBlockSizes[opcode]
     
     return intcode
 
