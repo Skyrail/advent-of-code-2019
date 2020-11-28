@@ -1,0 +1,43 @@
+Opcode 1 - addition
+Block length - 4
+Paramters - 3
+Input: no
+Param 1 - integer one 
+Param 2 - integer two
+Param 3 - result location
+
+Opcode 2 - multiplication
+Block length - 4
+Parameters - 3 
+Input: no
+Param 1 - integer one 
+Param 2 - integer two
+Param 3 - result location
+
+Opcode 3 - saves an integer to a location
+Block length - 2
+Parameters - 1
+Input: yes (Integer)
+Param 1 - integer location
+
+Opcode 4 - retrieves an integer from a location
+Block length - 2
+Parameters 1
+Input: no
+Param 1 - integer location
+
+Opcode 99 - terminates the program
+Block length - 1
+Parameters - none
+Input: no
+
+
+Paramters:
+Parameter mode 1 - position mode
+Parameter mode 2 - immediate mode (value)
+
+Opcode format
+ABCXX,i,j,k
+
+ABC - parameter mode for parameters i,j,k (in order)
+XX - 2 digit opcode, leading zero
