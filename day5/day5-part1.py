@@ -19,7 +19,7 @@ def getParameters(intcode, position):
         
         mode = modes[index] if modes[index:] else 0
 
-        if int(mode) == 1 or opcode in [3,4]:
+        if int(mode) == 1:
             # Value/Immediate mode - the value given is to be used
             parameters[index] = position + index + 1
 
@@ -28,28 +28,6 @@ def getParameters(intcode, position):
             parameters[index] = intcode[position + index + 1]
 
     return parameters
-
-def intcodeAddition(intcode, parameters):
-
-    intcode[parameters[2]] = int(intcode[parameters[0]]) + int(intcode[parameters[1]])
-    
-    return intcode
-
-def intcodeMultiplication(intcode, parameters):
-
-    intcode[parameters[2]] = int(intcode[parameters[0]]) * int(intcode[parameters[1]])
-    
-    return intcode
-
-def intcodeInsertValue(intcode, position):
-
-    intcode[intcode[position]] = int(input("Please input a value: "))
-    
-    return intcode
-
-def intcodeOutputValue(intcode, position):
-    
-    print(intcode[intcode[position]])
 
 def processIntcode(intcode):
 
@@ -61,41 +39,50 @@ def processIntcode(intcode):
         parameters = getParameters(intcode, position)
         
         if opcode == 99:
+            # Quit program
             break
 
         elif opcode == 1:
-            intcode = intcodeAddition(intcode, parameters)
+            # Addition
+            intcode[parameters[2]] = int(intcode[parameters[0]]) + int(intcode[parameters[1]])
         
         elif opcode == 2:
-            intcode = intcodeMultiplication(intcode, parameters)
+            # Multiplication
+            intcode[parameters[2]] = int(intcode[parameters[0]]) * int(intcode[parameters[1]])
         
         elif opcode == 3:
-            intcode = intcodeInsertValue(intcode, parameters[0])
+            # Insert value
+            intcode[parameters[0]] = int(input("Please input a value: "))
         
         elif opcode == 4:
-            intcodeOutputValue(intcode, parameters[0])
+            # Output value
+            print(intcode[parameters[0]])
 
         elif opcode == 5:
+            # Jump if not zero
             if intcode[parameters[0]] != 0:
                 position = intcode[parameters[1]]
                 continue
         
         elif opcode == 6:
+            # Jump if zero
             if intcode[parameters[0]] == 0:
                 position = intcode[parameters[1]]
                 continue
         
         elif opcode == 7:
+            # Less than comparison
             if int(intcode[parameters[0]]) < int(intcode[parameters[1]]):
-                intcode[intcode[parameters[2]]] = 1
+                intcode[parameters[2]] = 1
             else:
-                intcode[intcode[parameters[2]]] = 0
+                intcode[parameters[2]] = 0
 
         elif opcode == 8:
+            # Equality comparison
             if int(intcode[parameters[0]]) == int(intcode[parameters[1]]):
-                intcode[intcode[parameters[2]]] = 1
+                intcode[parameters[2]] = 1
             else:
-                intcode[intcode[parameters[2]]] = 0
+                intcode[parameters[2]] = 0
 
         position += opcodeBlockSizes[opcode]
     
