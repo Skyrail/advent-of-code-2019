@@ -1,4 +1,4 @@
-import sys, os, itertools
+import sys, os
 
 opcodeBlockSizes = { 1: 4, 2: 4, 3: 2, 4: 2, 5: 3, 6: 3, 7: 4, 8: 4, 99: 1 }
 
@@ -102,7 +102,6 @@ if os.path.isfile(inputPath):
         originalIntcodeList = list(map(int, intcode.split(',')))
 
         processIntcode(originalIntcodeList)
-
 
     except IOError:
         print(f'Unable to open file {inputPath}')
