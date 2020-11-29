@@ -1,30 +1,28 @@
 
 import os, sys
 
+def count_orbits(orbitMap, body):
+    count = 0
+    if body in orbitMap:
+        count += count_orbits(orbitMap, orbitMap[body]) + 1
+    
+    return count
+
 inputPath = sys.argv[1]
 
 if os.path.isfile(inputPath):
     try:
         orbitFile = open(inputPath)
         
-        orbits = orbitFile.read().split()
-
         orbitCount, orbitMap = 0, {}
 
-        for orbit in orbits:
-            orbiting,orbitee = orbit.split(')')
+        for orbit in orbitFile.read().split():
+            body,planet = orbit.split(')')
+            orbitMap[planet] = body
 
-            if orbiting in orbitMap:
-                orbitMap[orbiting].append(orbitee)
-            else:
-                orbitMap[orbiting] = [orbitee]
-
-            for planet in orbitMap:
-                if orbiting in orbitMap[planet]:
-                    orbitMap[planet].append(orbitee)
-
-        for _,orbitMapOrbits in orbitMap.items():
-            orbitCount += len(orbitMapOrbits)
+        for planet,body in orbitMap.items():
+            orbitCount += count_orbits(orbitMap, body)
+            orbitCount += 1
 
         print(f'Total orbit count is {orbitCount}')
 
