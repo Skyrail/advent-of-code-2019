@@ -8,6 +8,25 @@ def count_orbits(orbitMap, body):
     
     return count
 
+def get_parents(orbitMap, child):
+
+    parents = set()
+
+    if child in orbitMap:
+        parents.add(orbitMap.get(child))
+        parents = parents.union(get_parents(orbitMap, orbitMap.get(child)))
+
+    return parents
+
+
+def count_pathway(orbitMap, pointA, pointB):
+
+    pointAParents, pointBParents = get_parents(orbitMap, pointA), get_parents(orbitMap, pointB)
+
+    uniqueParents = pointAParents ^ pointBParents
+
+    return len(uniqueParents)
+
 inputPath = sys.argv[1]
 
 if os.path.isfile(inputPath):
@@ -24,7 +43,7 @@ if os.path.isfile(inputPath):
             orbitCount += count_orbits(orbitMap, body)
             orbitCount += 1
 
-        print(f'Total orbit count is {orbitCount}')
+        print(f'Pathway count bteween SAN and YOU is: {count_pathway(orbitMap, "SAN", "YOU")}')
 
     except IOError:
         print(f'Unable to open file {inputPath}')
